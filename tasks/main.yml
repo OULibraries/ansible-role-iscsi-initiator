@@ -1,0 +1,39 @@
+---
+# tasks file for iscsi-initiator
+- name: Packages for iSCSI initiator
+  yum: name={{ item }} state=present
+  with_items:
+  - iscsi-initiator-utils
+- name: Set iSCSI timout
+  template:
+    src: 50-udev.rules.j2
+    dest: /etc/udev/rules.d/50-udev.rules
+    owner: root
+    group: root
+    mode: 0644
+- name: Set iSCSI Qualified Name
+  template:
+    src: initiatorname.iscsi.j2
+    dest: /etc/iscsi/initiatorname.iscsi
+    owner: root
+    group: root
+    mode: 0644
+- name: Configure CHAPS
+  template:
+    src: iscsid.conf.j2
+    dest: /etc/iscsi/iscsid.conf
+    owner: root
+    group: root
+    mode: 0600
+- name: iSCSI discovery and login
+  open_iscsi:
+    discover: yes
+    auto_node_startup: yes
+    portal: "{{ item.portal }}"
+    target: "{{ item.target }}"
+    login: yes
+    node_auth: CHAP
+    node_user: "{{ item.username }}"
+    node_pass: "{{ item.password }}"
+  with_items:
+    - "{{ iscsi }}"
