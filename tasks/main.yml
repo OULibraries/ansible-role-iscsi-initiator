@@ -18,7 +18,7 @@
     owner: root
     group: root
     mode: 0644
-- name: Configure CHAPS
+- name: Configure CHAP
   template:
     src: iscsid.conf.j2
     dest: /etc/iscsi/iscsid.conf
